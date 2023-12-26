@@ -18,7 +18,6 @@ func Sum() (int, error) {
 	}
 
 	scanner := bufio.NewScanner(data)
-	//scanner.Split(bufio.ScanLines)
 
 	for scanner.Scan() {
 		if scanner.Err() != nil {
