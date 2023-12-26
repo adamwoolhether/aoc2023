@@ -62,12 +62,12 @@ func extractValue(lineBytes []byte) int {
 		}
 	}
 
-	if !foundUpper {
-		return int(lower)*10 + int(lower)
-	}
-
 	if !foundLower {
 		return int(upper)*10 + int(upper)
+	}
+
+	if !foundUpper {
+		return int(lower)*10 + int(lower)
 	}
 
 	return int(lower)*10 + int(upper)
