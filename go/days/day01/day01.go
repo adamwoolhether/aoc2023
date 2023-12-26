@@ -16,6 +16,7 @@ func Sum() (int, error) {
 	if err != nil {
 		return -1, fmt.Errorf("opening calibration document: %w", err)
 	}
+	defer data.Close()
 
 	scanner := bufio.NewScanner(data)
 
