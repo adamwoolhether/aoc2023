@@ -1,6 +1,6 @@
 const std = @import("std");
-
 const filePath = "days/day01/calibration.txt";
+const allocator = std.heap.page_allocator;
 
 pub fn day01() anyerror!u32 {
     const file = try std.fs.cwd().openFile(filePath, .{});
@@ -9,10 +9,12 @@ pub fn day01() anyerror!u32 {
     var buf_reader = std.io.bufferedReaderSize(1024, file.reader());
     const reader = buf_reader.reader();
 
-    var buffer: [100]u8 = undefined;
+    var buffer = try allocator.alloc(u8, 100);
+    defer allocator.free(buffer);
+
     var result: u32 = 0;
 
-    while (try reader.readUntilDelimiterOrEof(&buffer, '\n')) |line| {
+    while (try reader.readUntilDelimiterOrEof(buffer, '\n')) |line| {
         const val = extract_value(line);
         result += val;
         // std.debug.print("{}\n", .{val});
