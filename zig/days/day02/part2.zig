@@ -10,10 +10,6 @@ pub fn maxPowerGames(line: []u8) anyerror!u64 {
     var game = std.mem.splitAny(u8, line, ":");
     _ = game.next();
 
-    // var idParts = std.mem.splitAny(u8, game.next().?, " ");
-    // _ = idParts.next();
-
-    // const gameID = try std.fmt.parseInt(u8, idParts.next().?, 10);
     var results = std.mem.splitAny(u8, game.next().?, ";");
 
     var highestCnt = Game{
