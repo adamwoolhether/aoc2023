@@ -16,12 +16,12 @@ var limits = map[string]int{
 //go:embed games.txt
 var gamesInput embed.FS
 
-func Result() (int, error) {
-	var result int
+func Run() (int, int, error) {
+	var part1Result, part2Result int
 
 	data, err := gamesInput.Open("games.txt")
 	if err != nil {
-		return -1, fmt.Errorf("opening calibration document: %w", err)
+		return -1, -1, fmt.Errorf("opening calibration document: %w", err)
 	}
 	defer data.Close()
 
@@ -29,27 +29,28 @@ func Result() (int, error) {
 
 	for scanner.Scan() {
 		if scanner.Err() != nil {
-			return -1, fmt.Errorf("scanning calibration document: %w", err)
+			return -1, -1, fmt.Errorf("scanning calibration document: %w", err)
 		}
 
 		lineBytes := scanner.Bytes()
 
-		result += possibleGames(lineBytes)
+		part1Result += possibleGames(lineBytes)
+		part2Result += maxPowerGames(lineBytes)
 	}
 
-	return result, nil
+	return part1Result, part2Result, nil
 }
 
 func possibleGames(line []byte) int {
-	before, after, _ := bytes.Cut(line, []byte(":"))
+	gameID, rounds, _ := bytes.Cut(line, []byte(":"))
 
-	results := bytes.Split(after, []byte(";"))
+	results := bytes.Split(rounds, []byte(";"))
 
 	for i := range results {
-		picks := bytes.Split(results[i], []byte(","))
+		cubes := bytes.Split(results[i], []byte(","))
 
-		for j := range picks {
-			trimmed := bytes.TrimSpace(picks[j])
+		for j := range cubes {
+			trimmed := bytes.TrimSpace(cubes[j])
 			amount, color, _ := bytes.Cut(trimmed, []byte(" "))
 
 			amt := byteToInt(amount)
@@ -60,9 +61,41 @@ func possibleGames(line []byte) int {
 		}
 	}
 
-	successfulAmt, _ := bytes.CutPrefix(before, []byte("Game "))
+	successfulAmt, _ := bytes.CutPrefix(gameID, []byte("Game "))
 
 	return byteToInt(successfulAmt)
+}
+
+func maxPowerGames(line []byte) int {
+	_, rounds, _ := bytes.Cut(line, []byte(":"))
+
+	results := bytes.Split(rounds, []byte(";"))
+
+	highestCubeCount := make(map[string]int, 3)
+
+	for i := range results {
+		cubes := bytes.Split(results[i], []byte(","))
+
+		for j := range cubes {
+			trimmed := bytes.TrimSpace(cubes[j])
+			amount, color, _ := bytes.Cut(trimmed, []byte(" "))
+			colorStr := string(color)
+
+			amt := byteToInt(amount)
+
+			stored, ok := highestCubeCount[colorStr]
+			if !ok || amt > stored {
+				highestCubeCount[colorStr] = amt
+			}
+		}
+	}
+
+	result := 1
+	for _, v := range highestCubeCount {
+		result *= v
+	}
+
+	return result
 }
 
 func byteToInt(input []byte) int {
