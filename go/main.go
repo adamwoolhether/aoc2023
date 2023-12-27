@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	day01Pt1Result, day01Pt2Result, err := day01.Sum()
+	day01Pt1Result, day01Pt2Result, err := day01.Run()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Day 01 Error: %v\n", err)
 		os.Exit(1)

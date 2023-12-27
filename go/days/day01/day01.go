@@ -9,7 +9,7 @@ import (
 //go:embed calibration.txt
 var calibrationDoc embed.FS
 
-func Sum() (int, int, error) {
+func Run() (int, int, error) {
 	var part1Result, part2Result int
 
 	data, err := calibrationDoc.Open("calibration.txt")
