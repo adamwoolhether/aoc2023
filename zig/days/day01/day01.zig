@@ -1,8 +1,15 @@
 const std = @import("std");
+const part1 = @import("./part1.zig");
+const part2 = @import("./part2.zig");
 const filePath = "days/day01/calibration.txt";
 const allocator = std.heap.page_allocator;
 
-pub fn day01() anyerror!u32 {
+const day01_result = struct {
+    part1: u32,
+    part2: u32,
+};
+
+pub fn run() anyerror!day01_result {
     const file = try std.fs.cwd().openFile(filePath, .{});
     defer file.close();
 
@@ -12,60 +19,18 @@ pub fn day01() anyerror!u32 {
     var buffer = try allocator.alloc(u8, 100);
     defer allocator.free(buffer);
 
-    var result: u32 = 0;
+    var part1_result: u32 = 0;
+    var part2_result: u32 = 0;
 
     while (try reader.readUntilDelimiterOrEof(buffer, '\n')) |line| {
-        const val = extract_value(line);
-        result += val;
-        // std.debug.print("{}\n", .{val});
+        part1_result += part1.extract_vals(line);
+        part2_result += part2.extract_vals(line);
     }
+
+    const result = day01_result{
+        .part1 = part1_result,
+        .part2 = part2_result,
+    };
 
     return result;
-}
-
-fn extract_value(line: []u8) u8 {
-    var foundLower = false;
-    var foundUpper = false;
-
-    var start: usize = 0;
-    var end: usize = line.len - 1;
-
-    var lower: ?u8 = null;
-    var upper: ?u8 = null;
-
-    while (start <= end) {
-        if (foundLower and foundUpper) {
-            break;
-        }
-
-        if (!foundLower) {
-            if (isDigit(line[start])) {
-                lower = @intCast(line[start] - '0');
-                foundLower = true;
-            }
-            start += 1;
-        }
-
-        if (!foundUpper) {
-            if (isDigit(line[end])) {
-                upper = @intCast(line[end] - '0');
-                foundUpper = true;
-            }
-            end -= 1;
-        }
-    }
-
-    if (!foundUpper) {
-        return lower.? * 10 + lower.?;
-    }
-
-    if (!foundLower) {
-        return upper.? * 10 + upper.?;
-    }
-
-    return lower.? * 10 + upper.?;
-}
-
-fn isDigit(b: u8) bool {
-    return (b >= '0' and b <= '9');
 }
