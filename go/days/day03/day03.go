@@ -28,10 +28,10 @@ func Run() (int, error) {
 
 	scanner := bufio.NewScanner(data)
 
-	potentialPartNumbers := make([]schemaNum, 0) // x, y0, y1 : part#
+	potentialPartNumbers := make([]schemaNum, 0)
 	symbols := make(map[int][]int)
 
-	xAxis := 0
+	row := 0
 	for scanner.Scan() {
 		if scanner.Err() != nil {
 			return -1, fmt.Errorf("scanning calibration document: %w", err)
@@ -39,91 +39,20 @@ func Run() (int, error) {
 
 		line := scanner.Bytes()
 
-		analyze(line, xAxis, &potentialPartNumbers, symbols)
+		potentialPartNumbers = append(potentialPartNumbers, analyzeLine(line, row, symbols)...)
 
-		xAxis++
+		row++
 	}
 
-	var result int
-outerLoop:
-	for i := range potentialPartNumbers {
-		pot := potentialPartNumbers[i]
-		above := pot.row - 1
-		level := pot.row
-		below := pot.row + 1
+	part1 := getPartNumbers(potentialPartNumbers, symbols)
 
-		for _, v := range symbols[above] {
-			if isTouching(v, pot.iLow, pot.iTop) {
-				result += pot.val
-				continue outerLoop
-			}
-		}
-
-		for _, v := range symbols[level] {
-			if isTouching(v, pot.iLow, pot.iTop) {
-				result += pot.val
-				continue outerLoop
-			}
-		}
-
-		for _, v := range symbols[below] {
-			if isTouching(v, pot.iLow, pot.iTop) {
-				result += pot.val
-				continue outerLoop
-			}
-		}
-	}
-
-	return result, nil
+	return part1, nil
 }
 
 func isTouching(symbolLoc, low, top int) bool {
 	return (symbolLoc-1 >= low && symbolLoc-1 <= top) ||
 		(symbolLoc+1 >= low && symbolLoc+1 <= top) ||
 		symbolLoc == low || symbolLoc == top
-}
-
-func analyze(line []byte, row int, parts *[]schemaNum, symbols symbolMap) {
-	//i := 0
-	for i := 0; i < len(line); i++ {
-		if isSymbol(line[i]) {
-			symbols[row] = append(symbols[row], i)
-
-			continue
-		}
-
-		if isDigit(line[i]) {
-			for j := i + 1; ; {
-				if j >= len(line) {
-					*parts = append(*parts, schemaNum{
-						row:  row,
-						iLow: i,
-						iTop: j - 1,
-						val:  byteToInt(line[i:]),
-					})
-					break
-				}
-				if !isDigit(line[j]) {
-					*parts = append(*parts, schemaNum{
-						row:  row,
-						iLow: i,
-						iTop: j - 1,
-						val:  byteToInt(line[i:j]),
-					})
-
-					if isSymbol(line[j]) {
-						symbols[row] = append(symbols[row], j)
-					}
-
-					i = j
-					break
-				}
-
-				j++
-			}
-		}
-	}
-
 }
 
 func isDigit(b byte) bool {
