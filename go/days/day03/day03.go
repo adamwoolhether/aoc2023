@@ -45,13 +45,6 @@ func Run() (int, int, error) {
 		row++
 	}
 
-	//fmt.Println(gears)
-	//amtFnd := 0
-	//for _, g := range gears {
-	//	amtFnd += len(g)
-	//}
-	//fmt.Println(amtFnd)
-
 	part1 := getPartNumbers(potentialPartNumbers, symbols)
 	part2 := getGearRatios(potentialPartNumbers, gears)
 
