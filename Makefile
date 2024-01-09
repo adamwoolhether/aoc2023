@@ -5,3 +5,6 @@ new:
 	echo "package day${DAY}" >> go/days/"day"${DAY}/main.go
 	mkdir -p zig/days/"day"${DAY}
 	touch zig/days/"day"${DAY}/"day"${DAY}.zig
+
+fmt:
+	zig fmt .
