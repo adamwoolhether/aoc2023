@@ -20,7 +20,7 @@ func main() {
 	day03Pt1Res, day03Pt2Res, err := day03.Run()
 	handleError(03, err)
 
-	day4Res, err := day04.Run()
+	day4Pt1Res, day4Pt2Res, err := day04.Run()
 	handleError(04, err)
 
 	fmt.Printf("Day 01 Pt 1 Result: %d\n", day01Pt1Result)
@@ -29,7 +29,8 @@ func main() {
 	fmt.Printf("Day 02 Pt 2 Result: %d\n", day02Pt2Result)
 	fmt.Printf("Day 03 Pt 1 Result: %d\n", day03Pt1Res)
 	fmt.Printf("Day 03 Pt 2 Result: %d\n", day03Pt2Res)
-	fmt.Printf("Day 04 Pt 1 Result: %d\n", day4Res)
+	fmt.Printf("Day 04 Pt 1 Result: %d\n", day4Pt1Res)
+	fmt.Printf("Day 04 Pt 2 Result: %d\n", day4Pt2Res)
 
 }
 
