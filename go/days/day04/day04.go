@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
-	"encoding/hex"
 	"fmt"
-	"math"
 )
 
 //go:embed scratchcards.txt
@@ -57,44 +55,4 @@ func Run() (int, int, error) {
 	part2 = winAmt(winCardsAmt)
 
 	return part1, part2, nil
-}
-
-func cardScore(winningNumBytes [][]byte, myNumBytes [][]byte) (matches int, score int) {
-	winningNum := make(map[string]struct{})
-
-	for _, val := range winningNumBytes {
-		winningNum[hex.EncodeToString(val)] = struct{}{}
-	}
-
-	for _, val := range myNumBytes {
-		if _, found := winningNum[hex.EncodeToString(val)]; found {
-			matches++
-		}
-	}
-
-	//score := int(math.Pow(2, float64(matches)))- 1 // This adds them all up, not what we want here.
-	score = int(math.Pow(2, float64(matches-1)))
-
-	return matches, score
-}
-
-func winAmt(winningAmt []int) int {
-	var total int
-
-	totalWins := make([]int, len(winningAmt))
-	for i := range totalWins {
-		totalWins[i] = 1
-	}
-
-	for i, amt := range winningAmt {
-		for j := 1; j <= amt && i+j < len(winningAmt); j++ {
-			totalWins[i+j] += totalWins[i]
-		}
-	}
-
-	for _, count := range totalWins {
-		total += count
-	}
-
-	return total
 }
