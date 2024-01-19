@@ -17,4 +17,5 @@ pub fn main() anyerror!void {
     try std.io.getStdOut().writer().print("Day 03 Pt 1 Result: {}\n", .{day03Result.part1});
     try std.io.getStdOut().writer().print("Day 03 Pt 2 Result: {}\n", .{day03Result.part2});
     try std.io.getStdOut().writer().print("Day 04 Pt 1 Result: {}\n", .{day04Result.part1});
+    try std.io.getStdOut().writer().print("Day 04 Pt 2 Result: {}\n", .{day04Result.part2});
 }

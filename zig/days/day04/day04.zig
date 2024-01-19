@@ -21,6 +21,17 @@ pub fn run() anyerror!day04_result {
     var buffer = try allocator.alloc(u8, 1024);
     defer allocator.free(buffer);
 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const alloc = gpa.allocator();
+    defer {
+        if (gpa.deinit() == .leak) {
+            @panic("dealloc faile");
+        }
+    }
+
+    var winCardsAmt = std.ArrayList(usize).init(alloc);
+    defer winCardsAmt.deinit();
+
     while (try reader.readUntilDelimiterOrEof(buffer, '\n')) |line| {
         // std.debug.print("{s}\n", .{line});
 
@@ -34,8 +45,12 @@ pub fn run() anyerror!day04_result {
         const winningNums = firstHalfIter.next() orelse continue;
 
         const scoreRes = try card_score(winningNums, secondHalf);
-        part1Res += scoreRes;
+        part1Res += scoreRes.score;
+
+        try winCardsAmt.append(scoreRes.matchAmt);
     }
+
+    part2Res = try winAmt(winCardsAmt.items);
 
     const result = day04_result{
         .part1 = part1Res,
@@ -45,7 +60,12 @@ pub fn run() anyerror!day04_result {
     return result;
 }
 
-fn card_score(winningNums: []const u8, secondHalf: []const u8) anyerror!usize {
+const cardSum = struct {
+    score: usize,
+    matchAmt: usize,
+};
+
+fn card_score(winningNums: []const u8, secondHalf: []const u8) anyerror!cardSum {
     var winMap = std.AutoHashMap(usize, void).init(allocator);
     defer winMap.deinit();
 
@@ -69,10 +89,46 @@ fn card_score(winningNums: []const u8, secondHalf: []const u8) anyerror!usize {
     if (matches > 0) {
         // Probably a better way to do this, but since we're dealing with
         // a usize, compiler needs to ensure there is no overflow.
-        matches -= 1;
+        score = std.math.pow(usize, 2, matches - 1);
     }
 
-    score = std.math.pow(usize, 2, matches);
+    const ret = cardSum{
+        .score = score,
+        .matchAmt = matches,
+    };
 
-    return score;
+    return ret;
+}
+
+fn winAmt(winningAmt: []usize) anyerror!usize {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const alloc = gpa.allocator();
+    defer {
+        if (gpa.deinit() == .leak) {
+            @panic("dealloc failed");
+        }
+    }
+
+    var totalWins = std.ArrayList(usize).init(alloc);
+    defer totalWins.deinit();
+
+    var idx: usize = 0;
+    while (idx < winningAmt.len) : (idx += 1) {
+        try totalWins.append(1);
+    }
+
+    for (winningAmt, 0..) |amt, i| {
+        var j: usize = 1;
+        while (j <= amt and i + j < winningAmt.len) : (j += 1) {
+            totalWins.items[i + j] += totalWins.items[i];
+        }
+    }
+
+    var total: usize = 0;
+
+    for (totalWins.items) |count| {
+        total += count;
+    }
+
+    return total;
 }
