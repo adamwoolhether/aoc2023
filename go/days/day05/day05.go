@@ -28,10 +28,10 @@ const (
 //go:embed almanac.txt
 var almanac embed.FS
 
-func Run() (int, error) {
+func Run() (int, int, error) {
 	input, err := almanac.Open("almanac.txt")
 	if err != nil {
-		return 0, fmt.Errorf("opening almanac: %w", err)
+		return 0, 0, fmt.Errorf("opening almanac: %w", err)
 	}
 	defer input.Close()
 
@@ -59,8 +59,9 @@ func Run() (int, error) {
 	}
 
 	lowestLoc := findLowestLocation(seeds, mappings)
+	lowestLocPart2 := findLowestLocationPart2(seeds, mappings)
 
-	return lowestLoc, nil
+	return lowestLoc, lowestLocPart2, nil
 }
 
 func getInts(s string) []int {
@@ -91,6 +92,17 @@ func getMapping(s string) Mapping {
 	}
 
 	return m
+}
+
+// getDest is the key mapping logic for this puzzle.
+func getDest(src int, mappings []Mapping) int {
+	for _, m := range mappings {
+		if m.src <= src && src < m.src+m.rangeAmt {
+			return m.dest + (src - m.src)
+		}
+	}
+
+	return src
 }
 
 func scanTwoLines(data []byte, atEOF bool) (advance int, token []byte, err error) {

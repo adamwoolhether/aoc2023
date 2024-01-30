@@ -24,14 +24,3 @@ func findLowestLocation(seeds []int, mappings map[string][]Mapping) int {
 
 	return lowest
 }
-
-// getDest is the key mapping logic for this puzzle.
-func getDest(src int, mappings []Mapping) int {
-	for _, m := range mappings {
-		if m.src <= src && src <= m.src+m.rangeAmt {
-			return m.dest + (src - m.src)
-		}
-	}
-
-	return src
-}
